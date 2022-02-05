@@ -8,13 +8,83 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+import org.slf4j.ILoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.time.Instant;
+import java.util.HashMap;
 
 public class MatrixMultiply {
+
+    public static class Map
+            extends Mapper<LongWritable, Text, Text, Text> {
+        @Override
+        public void map(LongWritable key, Text value, Context context)
+                throws IOException, InterruptedException {
+            Configuration conf = context.getConfiguration();
+            int m = Integer.parseInt(conf.get("m"));
+            int p = Integer.parseInt(conf.get("p"));
+            String line = value.toString();
+            // (M, i, j, Mij);
+            String[] indicesAndValue = line.split(",");
+            Text outputKey = new Text();
+            Text outputValue = new Text();
+            if (indicesAndValue[0].equals("M")) {
+                for (int k = 0; k < p; k++) {
+                    outputKey.set(indicesAndValue[1] + "," + k);
+                    outputValue.set(indicesAndValue[0] + "," + indicesAndValue[2]
+                            + "," + indicesAndValue[3]);
+                    context.write(outputKey, outputValue);
+                    System.out.println("M: " + outputKey + " " + outputValue);
+                }
+            } else if (indicesAndValue[0].equals("N")) {
+                for (int i = 0; i < m; i++) {
+                    outputKey.set(i + "," + indicesAndValue[2]);
+                    outputValue.set(indicesAndValue[0] + "," + indicesAndValue[1]
+                            + "," + indicesAndValue[3]);
+                    context.write(outputKey, outputValue);
+                    System.out.println("N: " + outputKey + " " + outputValue);
+                }
+            }
+        }
+    }
+
+    public static class Reduce
+            extends Reducer<Text, Text, Text, Text> {
+        @Override
+        public void reduce(Text key, Iterable<Text> values, Context context)
+                throws IOException, InterruptedException {
+            String[] value;
+            //key=(i,k),
+            //Values = [(M/N,j,V/W),..]
+            HashMap<Integer, Float> hashA = new HashMap<Integer, Float>();
+            HashMap<Integer, Float> hashB = new HashMap<Integer, Float>();
+            for (Text val : values) {
+                value = val.toString().split(",");
+                if (value[0].equals("M")) {
+                    hashA.put(Integer.parseInt(value[1]), Float.parseFloat(value[2]));
+                } else {
+                    hashB.put(Integer.parseInt(value[1]), Float.parseFloat(value[2]));
+                }
+            }
+            int n = Integer.parseInt(context.getConfiguration().get("n"));
+            float result = 0.0f;
+            float m_ij;
+            float n_jk;
+            for (int j = 0; j < n; j++) {
+                m_ij = hashA.containsKey(j) ? hashA.get(j) : 0.0f;
+                n_jk = hashB.containsKey(j) ? hashB.get(j) : 0.0f;
+                result += m_ij * n_jk;
+            }
+            if (result != 0.0f) {
+                context.write(null,
+                        new Text(key.toString() + "," + Float.toString(result)));
+            }
+        }
+    }
 	
     public static void main(String[] args) throws Exception {
     	if (args.length != 2) {
@@ -69,4 +139,6 @@ public class MatrixMultiply {
  
         job.waitForCompletion(true);
     }
+
+
 }
