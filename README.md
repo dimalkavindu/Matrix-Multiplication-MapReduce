@@ -46,17 +46,14 @@ config
 ```
 
 ## Map-Reduce
-We will write Map and Reduce functions to process input files. Map and reduce functions will implement the following 
-algorithms:
-![Algorithns](img/algorithms.png)
 
-Map function will produce *key,value* pairs from the input data as it is described in *Algorithm 1*. Reduce function 
-uses the output of the Map function and performs the calculations and produces *key,value* pairs as described in 
-*Algorithm 2*. All outputs are written to HDFS. The value in row i and column k of product matrix P will be:
+### Fundamentals
+
+The value in row i and column k of product matrix P will be:
 
 ![Pik](img/latex_0.png)
 
-Let me examine the algorithms on an example to explain better. Suppose we have two matrices, M, 2x3 matrix, and N, 3x2 
+Let me examine the algorithms on an example to explain better. Suppose we have two matrices, M, 2x3 matrix, and N, 3x2
 matrix as follows:
 
 ![MxN](img/latex_1.png)
@@ -64,6 +61,16 @@ matrix as follows:
 The product P of MN will be as follows:
 
 ![P of MxN](img/latex_2.png)
+
+We will write Map and Reduce functions to process input files. Map and reduce functions will implement the following 
+algorithms:
+![Algorithns](img/algorithms.png)
+
+Map function will produce *key,value* pairs from the input data as it is described in *Algorithm 1*. Reduce function 
+uses the output of the Map function and performs the calculations and produces *key,value* pairs as described in 
+*Algorithm 2*. All outputs are written to HDFS.
+
+
 
 ### The Map Task
 
