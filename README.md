@@ -187,8 +187,8 @@ and creates the *key,value* pairs for the product matrix then writes its output 
 ### How to run
 
 The packaged jar is available at 'artifacts' directory. \
-Program arguments: <jar> <input matrices> <output directory> \
-Sample commands: MatrixMultiply.jar input_1 output
+Program arguments: *\<jar> \<input matrices> \<output directory>* \
+Sample commands: *MatrixMultiply.jar input_1 output*
 
 References
 --
