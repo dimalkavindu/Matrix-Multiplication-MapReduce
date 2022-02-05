@@ -38,7 +38,6 @@ public class MatrixMultiply {
                     outputValue.set(indicesAndValue[0] + "," + indicesAndValue[2]
                             + "," + indicesAndValue[3]);
                     context.write(outputKey, outputValue);
-                    System.out.println("M: " + outputKey + " " + outputValue);
                 }
             } else if (indicesAndValue[0].equals("N")) {
                 for (int i = 0; i < m; i++) {
@@ -46,7 +45,6 @@ public class MatrixMultiply {
                     outputValue.set(indicesAndValue[0] + "," + indicesAndValue[1]
                             + "," + indicesAndValue[3]);
                     context.write(outputKey, outputValue);
-                    System.out.println("N: " + outputKey + " " + outputValue);
                 }
             }
         }
