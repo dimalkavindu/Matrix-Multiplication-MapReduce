@@ -1,0 +1,8 @@
+# Project exclude paths
+/.
+/target/
+out.log
+results.log
+MatrixMultiply.iml
+.idea
+output
