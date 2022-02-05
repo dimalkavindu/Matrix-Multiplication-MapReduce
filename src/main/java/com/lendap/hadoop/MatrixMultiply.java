@@ -1,19 +1,17 @@
 package com.lendap.hadoop;
 
 import org.apache.hadoop.conf.*;
+import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
-import org.slf4j.ILoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.time.Instant;
 import java.util.HashMap;
 
@@ -90,11 +88,16 @@ public class MatrixMultiply {
             System.exit(2);
         }
 
+        //Create a new configuration object to pass the configs to hadoop nodes
+        Configuration conf = new Configuration();
+
         //read configs for the test
-        File configFile = new File(args[0]+"/config");
-        BufferedReader b = new BufferedReader(new FileReader(configFile));
+        FileSystem fs = FileSystem.get(conf);
+        Path configFilePath = new Path(args[0]+"/config");
+        FSDataInputStream inputStream = fs.open(configFilePath);
+
         String configLine;
-        if ((configLine = b.readLine()) == null){
+        if ((configLine = inputStream.readLine()) == null){
             System.out.println("Could not read the configurations");
             return;
         }
@@ -105,8 +108,7 @@ public class MatrixMultiply {
             return;
         }
 
-        //Create a new configuration object to pass the configs to hadoop nodes
-        Configuration conf = new Configuration();
+
         // m and n denotes the dimensions of matrix M.
         // m = number of rows
         // n = number of columns
