@@ -184,6 +184,10 @@ and creates the *key,value* pairs from the input files.
 Reducer class extends org.apache.hadoop.mapreduce.Reducer class and implements the reduce task described in Algorithm 2 
 and creates the *key,value* pairs for the product matrix then writes its output to HDFS.
 
+### How to run
+
+The packaged jar is available at 'artifacts' directory. \
+Sample program arguments: <jar> input_1 output
 
 References
 --
