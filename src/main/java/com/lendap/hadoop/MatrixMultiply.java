@@ -1,7 +1,6 @@
 package com.lendap.hadoop;
 
 import org.apache.hadoop.conf.*;
-import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.io.*;
@@ -88,16 +87,16 @@ public class MatrixMultiply {
             System.exit(2);
         }
 
+
         //Create a new configuration object to pass the configs to hadoop nodes
         Configuration conf = new Configuration();
 
-        //read configs for the test
-        FileSystem fs = FileSystem.get(conf);
-        Path configFilePath = new Path(args[0]+"/config");
-        FSDataInputStream inputStream = fs.open(configFilePath);
+        Path path = new Path(args[0]+"/config");
+        FileSystem fs = path.getFileSystem(conf);
+        BufferedReader b = new BufferedReader(new InputStreamReader(fs.open(path)));
 
         String configLine;
-        if ((configLine = inputStream.readLine()) == null){
+        if ((configLine = b.readLine()) == null){
             System.out.println("Could not read the configurations");
             return;
         }
@@ -107,7 +106,6 @@ public class MatrixMultiply {
             System.out.println("Config file content is invalid");
             return;
         }
-
 
         // m and n denotes the dimensions of matrix M.
         // m = number of rows
@@ -124,6 +122,7 @@ public class MatrixMultiply {
 
         @SuppressWarnings("deprecation")
 		Job job = new Job(conf, "MatrixMultiply");
+
         job.setJarByClass(MatrixMultiply.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
@@ -133,7 +132,7 @@ public class MatrixMultiply {
  
         job.setInputFormatClass(TextInputFormat.class);
         job.setOutputFormatClass(TextOutputFormat.class);
- 
+
         FileInputFormat.addInputPath(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(outputDir));
  
